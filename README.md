@@ -1,3 +1,3 @@
-# Exercises in cpp
+# Exercises in C++
 
-Compilation of exercises in cpp.
+Exercises in C++.
