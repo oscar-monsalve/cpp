@@ -1,14 +1,12 @@
-#include<iostream>
-using namespace std;
+#include <print>
+#include <vector>
 
 int main() {
 
-    int arr[] = {};
+    std::vector<int> arr;
 
     for (int i : arr) {
-
-        cout << arr;
-
+        std::println("{}", i);
     }
 
     return 0;

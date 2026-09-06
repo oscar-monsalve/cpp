@@ -1,47 +1,48 @@
 // Write a program that prompts the user to enter an integer in a while loop until "done" is entered. Print out to the user which number is
 // larger and print the sum of the numbers.
 
-#include<iostream>
+#include <cctype>
+#include <iostream>
+#include <print>
 #include <string>
-using namespace std;
 
 int main() {
 
     int a;
     int b;
     int sum;
-    string input;
+    std::string input;
 
     while (true) {
-        cout << "Enter the first integer number (or \"done\" to finish): ";
-        cin >> input;
+        std::print("Enter the first integer number (or \"done\" to finish): ");
+        std::cin >> input;
 
         if (input == "done") {
-            cout << "The program is finished";
+            std::println("The program is finished");
             break;
         }
 
         // check if "a" is an integer
-        if (!isdigit(input[0])) {
-            cout << "Error. Enter an integer" << endl;
+        if (!std::isdigit(static_cast<unsigned char>(input[0]))) {
+            std::println("Error. Enter an integer");
             continue;
         }
 
-        a = stoi(input);
+        a = std::stoi(input);
 
-        cout << "Enter the second integer number: ";
-        cin >> b;
+        std::print("Enter the second integer number: ");
+        std::cin >> b;
 
         if(a < b) {
-            cout << a << " is less than " << b << endl;
+            std::println("{} is less than {}", a, b);
         } else if (a == b) {
-            cout << a << " is equal to " << b << endl;
+            std::println("{} is equal to {}", a, b);
         } else if (a > b){
-            cout << a << " is greater than " << b << endl;
+            std::println("{} is greater than {}", a, b);
         }
 
     sum = a + b;
-    cout << "The sum is " << sum << endl;
+    std::println("The sum is {}", sum);
 
     }
 

@@ -1,9 +1,9 @@
-#include<iostream>
+#include <print>
 
 class MyClass {
     public:
         void Method() {
-            std::cout << "This is a class method\n";
+            std::println("This is a class method");
     }
 
 };

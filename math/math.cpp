@@ -1,14 +1,14 @@
-#include<iostream>
-#include<cmath>
-using namespace std;
+#include <cmath>
+#include <numbers>
+#include <print>
 
 int main() {
 
-    double x = M_PI/2;
+    double x = std::numbers::pi / 2;
     int y = 3;
 
-    cout << sin(x) << endl;
-    cout << pow(y,2);
+    std::println("{}", std::sin(x));
+    std::println("{}", std::pow(y, 2));
 
     return 0;
 

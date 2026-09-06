@@ -1,7 +1,6 @@
 // The for-each for loop is used to loop within an array
 
-#include<iostream>
-using namespace std;
+#include <print>
 
 int main() {    
 
@@ -9,7 +8,7 @@ int main() {
 
     for (int i : arr) {
 
-        cout << i << endl;
+        std::println("{}", i);
     }
 
     return 0;

@@ -1,28 +1,28 @@
- // Take any positive integer n. If n is even, divide n by 2 to get n / 2. If n is odd, multiply n by 3 and add 1 to get 3n + 1. Repeat
- // the process indefinitely. The conjecture states that no matter which number you start with, you will always reach 1 eventually. Given
- // a number n, return the number of steps required to reach 1.
+ // Take any positive integer n. If n is even, divide n by 2 to get n / 2. If n is odd, multiply n by 3 and add 1
+ // to get 3n + 1. Repeat the process indefinitely. The conjecture states that no matter which number you start
+ // with, you will always reach 1 eventually. Given a number n, return the number of steps required to reach 1.
 
-#include<iostream>
-#include<string>
-
-using namespace std;
+#include <cctype>
+#include <iostream>
+#include <print>
+#include <string>
 
 int main() {
 
     int n;
     int count = 0;
-    string input;
+    std::string input;
 
     while  (true){
-        cout << "Enter an integer: ";
-        cin >> input;
+        std::print("Enter an integer: ");
+        std::cin >> input;
 
-        if (!isdigit(input[0])) {
-            cout << "Invalid input." << "\n\n";
+        if (!std::isdigit(static_cast<unsigned char>(input[0]))) {
+            std::println("Invalid input.\n");
         }
 
-        if (isdigit(input[0])) {
-            n = stoi(input);
+        if (std::isdigit(static_cast<unsigned char>(input[0]))) {
+            n = std::stoi(input);
             break;
         }
 
@@ -31,7 +31,7 @@ int main() {
     while (true) {
 
         if (n == 1) {
-            cout << "The program has reached: " << n << "\n\n";
+            std::println("The program has reached: {}\n", n);
             break;
         } else if (n % 2 == 0) {
             n = n / 2;
@@ -41,11 +41,11 @@ int main() {
 
         count++;
 
-        cout << n << endl;
+        std::println("{}", n);
 
     }
 
-    cout << "It took " << count << " cycles to reach " << n << endl;
+    std::println("It took {} cycles to reach {}", count, n);
 
     return 0;
 }

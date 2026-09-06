@@ -1,17 +1,12 @@
-#include<iostream>
-using namespace std;
+#include <print>
 
 int main() {
 
-    int array[] = {5,3,6,10};
+    int array[] = {5, 3, 6, 10};
 
-    for (int i = 0; i < 4; i++) {
-
-        cout << array[i] << endl;
-
+    for (int value : array) {
+        std::println("{}", value);
     }
 
-
     return 0;
-
 }

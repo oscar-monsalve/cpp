@@ -1,17 +1,15 @@
-#include<iostream>
-#include<random>
-
-using namespace std;
+#include <print>
+#include <random>
 
 int main() {
 
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int> dis(0,100);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dis(0, 100);
 
     int randomNum = dis(gen);
 
-    cout << "The random number is: " << randomNum << endl;
+    std::println("The random number is: {}", randomNum);
 
     return 0;
 }

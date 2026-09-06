@@ -1,22 +1,22 @@
-#include<iostream>
-using namespace std;
+#include <iostream>
+#include <print>
 
 int main() {
 
     int a;
     int b;
 
-    cout << "Enter a number: ";
-    cin >> a;
-    cout << "Enter other number:";
-    cin >> b;
+    std::print("Enter a number: ");
+    std::cin >> a;
+    std::print("Enter other number: ");
+    std::cin >> b;
 
     if (a<b) {
-        cout << a << " is smaller than " << b;
+        std::println("{} is smaller than {}", a, b);
     } else if (a==b) {
-        cout << a << " is equal to " << b;
+        std::println("{} is equal to {}", a, b);
     } else {
-        cout << a << " is not smaller than " << b;
+        std::println("{} is not smaller than {}", a, b);
     }
 
     return 0;

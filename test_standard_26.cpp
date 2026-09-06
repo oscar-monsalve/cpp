@@ -1,6 +1,5 @@
 #include <print>    // Required for std::print and std::println
 #include <tuple>
-#include <vector>
 
 int main() {
     // 1. C++23/26 Printing System
@@ -26,7 +25,7 @@ int main() {
     int data_node = 42;
     int* ptr = &data_node;
 
-    std::println("Uppercase hex pointer: {:P}", (void*)ptr);
+    std::println("Uppercase hex pointer: {:P}", static_cast<const void*>(ptr));
     std::println("Padded nullptr representation: {:016}", nullptr);
 
     return 0;

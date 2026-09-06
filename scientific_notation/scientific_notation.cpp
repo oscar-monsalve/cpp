@@ -1,11 +1,9 @@
-#include<iostream>
-using namespace std;
+#include <print>
 
 int main() {
-    int x = 3;
     int power = 3e3;
 
-    cout <<"The power operation is:\n" << power;
+    std::println("The power operation is:\n{}", power);
 
     return 0;
 }

@@ -1,4 +1,4 @@
-#include <iostream>
+#include <print>
 #include <string>
 
 // Constructor Rules:
@@ -14,10 +14,8 @@ class Employee {
 
     public:
         // Constructor
-        Employee(std::string name, float salary) {
-            this->name = name;
-            this->salary = salary;
-        }
+        Employee(std::string employee_name, float employee_salary)
+            : name(employee_name), salary(employee_salary) {}
 
         // Getters
         std::string get_name() {
@@ -29,17 +27,17 @@ class Employee {
         }
 
         // Setters
-        void set_name(std::string name) {
-            this->name = name;
+        void set_name(std::string employee_name) {
+            name = employee_name;
         }
 
-        void set_salary(float salary) {
-            this->salary = salary;
+        void set_salary(float employee_salary) {
+            salary = employee_salary;
         }
 
         // Instance method
         void display_details() {
-            std::cout << "Employee: " << name << ", " << "Salary: " << salary << std::endl;
+            std::println("Employee: {}, Salary: {}", name, salary);
         }
 
 };

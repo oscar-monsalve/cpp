@@ -1,5 +1,5 @@
-#include<iostream>
-using namespace std;
+#include <iostream>
+#include <print>
 
 int main() {
 
@@ -7,15 +7,14 @@ int main() {
     int n2;
     int sum;
 
-    cout << "Enter the first number: ";
-    cin >> n1;
-    cout << "Enter the second number: ";
-    cin >> n2;
+    std::print("Enter the first number: ");
+    std::cin >> n1;
+    std::print("Enter the second number: ");
+    std::cin >> n2;
 
     sum = n1+n2;
 
-    cout << "The sum is: ";
-    cout << sum;
+    std::println("The sum is: {}", sum);
 
     return 0;
 
