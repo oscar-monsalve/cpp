@@ -6,7 +6,7 @@
 // - Print the value and address before and after the modification.
 // - Explain the roles of the address-of (`&`) and dereference (`*`) operators.
 
-#include<iostream>
+#include <print>
 
 int main () {
     int oldNumber = 1;
@@ -14,14 +14,15 @@ int main () {
     // Memory address of the variable
     int* ptr = &oldNumber;
 
-    std::cout << "Old number's memory address: " << ptr << "\n";
-    std::cout << "Old number's value: " << *ptr << "\n\n";
+    std::println("Old number's memory address: {}", static_cast<const void*>(ptr));
+    std::println("Old number's value: {}", *ptr);
+    std::println();
 
     int newNumber = 9;
     *ptr = newNumber;
 
-    std::cout << "New number's memory address: " << ptr << "\n";
-    std::cout << "New number's value: " << *ptr << "\n";
+    std::println("New number's memory address: {}", static_cast<const void*>(ptr));
+    std::println("New number's value: {}", *ptr);
 
     return 0;
 }
