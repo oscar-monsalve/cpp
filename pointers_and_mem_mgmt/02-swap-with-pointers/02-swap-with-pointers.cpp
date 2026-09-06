@@ -10,6 +10,13 @@
 #include <iostream>
 
 void swapValues(int* first, int* second) {
+    if (first == nullptr || second == nullptr) {
+        std::cout << "Null pointer found: " << first << second << "\n";
+        std::cout << "Exiting safely." << first << second << "\n";
+        return;
+    }
+
+    int* x = second;
 }
 
 int main () {
