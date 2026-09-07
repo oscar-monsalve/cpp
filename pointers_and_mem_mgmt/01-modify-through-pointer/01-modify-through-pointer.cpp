@@ -12,17 +12,19 @@ int main () {
     int oldNumber = 1;
 
     // Memory address of the variable
-    int* ptr = &oldNumber;
+    int* ptrOldNumber = &oldNumber;  // The operator '&' enables to get the memory address of the variable.
 
-    std::println("Old number's memory address: {}", static_cast<const void*>(ptr));
-    std::println("Old number's value: {}", *ptr);
+    std::println("Memory address before modification: {}", static_cast<const void*>(ptrOldNumber));
+    // The '*' operator (preceding the variable name) allows to "dereference" the pointer, which enables access
+    // to the value of the variable, not the memory address.
+    std::println("Value before modification: {}", *ptrOldNumber);
     std::println();
 
-    int newNumber = 9;
-    *ptr = newNumber;
+    *ptrOldNumber = 9;
 
-    std::println("New number's memory address: {}", static_cast<const void*>(ptr));
-    std::println("New number's value: {}", *ptr);
+    // The value of 'oldNumber' changed, but the memory address does not.
+    std::println("Memory address after modification: {}", static_cast<const void*>(ptrOldNumber));
+    std::println("Value after modification: {}", *ptrOldNumber);
 
     return 0;
 }

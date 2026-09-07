@@ -8,6 +8,7 @@
 // - Handle null pointers without crashing.
 
 #include <print>
+#include <cassert>
 
 void swapValues(int* first, int* second) {
     // Check if the pointers are not null
@@ -31,9 +32,25 @@ int main () {
     std::println("'Second' before swap: {}\n", second);
 
     swapValues(&first, &second);
+    assert(first == 9 && second == 1);
 
     std::println("'First' after swap: {}", first);
-    std::println("'Second' after swap: {}", second);
+    std::println("'Second' after swap: {}\n", second);
+
+    // Further testing and asserting that with null pointers the number should remain unswapped
+    std::println("Further testing with null pointers:");
+
+    swapValues(nullptr, &second);
+    assert(first == 9 && second == 1);
+
+    swapValues(&first, nullptr);
+    assert(first == 9 && second == 1);
+
+    swapValues(nullptr, nullptr);
+    assert(first == 9 && second == 1);
+
+    swapValues(&first, &first);
+    assert(first == 9 && second == 1);
 
     return 0;
 }
