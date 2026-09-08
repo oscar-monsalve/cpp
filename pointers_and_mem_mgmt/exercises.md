@@ -1,6 +1,6 @@
 # C++ Pointers and Memory Management Exercises
 
-## 1. Modify a Value Through a Pointer
+## 1. Modify a Value Through a Pointer (DONE)
 
 Write a program that declares an integer, stores its address in a pointer, and changes the integer's value through the pointer.
 
@@ -9,7 +9,7 @@ Write a program that declares an integer, stores its address in a pointer, and c
 - Print the value and address before and after the modification.
 - Explain the roles of the address-of (`&`) and dereference (`*`) operators.
 
-## 2. Swap Two Values Using Pointers
+## 2. Swap Two Values Using Pointers (DONE)
 
 Implement a function `void swapValues(int* first, int* second)` that swaps two integers through pointers.
 
@@ -18,7 +18,7 @@ Implement a function `void swapValues(int* first, int* second)` that swaps two i
 - Call the function from `main` and print the values before and after the swap.
 - Handle null pointers without crashing.
 
-## 3. Traverse an Array With Pointer Arithmetic
+## 3. Traverse an Array With Pointer Arithmetic (DONE)
 
 Create an integer array and use only pointer arithmetic, rather than array indexing, to calculate its sum, minimum, and maximum values.
 
