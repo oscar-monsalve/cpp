@@ -75,8 +75,9 @@ int main () {
     int arrayLength5 = std::size(numberArray5);
     int arrayLength6 = std::size(numberArray6);
 
-    // Using the array name to create a pointer automatically decays to an int*. Using '&numberArray' in this
-    // case is not correct because it creates an 'int(*)[5]' type, and a 'const int*' type is needed.
+    // Using the array name to create a pointer automatically decays to an int* (pointing to the first array
+    // element). Using '&numberArray' in this case is not correct because it creates an 'int(*)[5]' type,
+    // and a 'const int*' type is needed.
     const int* startPtr1 = numberArray1;
     const int* endPtr1 = numberArray1 + arrayLength1;  // One past the last element; do not dereference
 
