@@ -18,33 +18,34 @@
    manage dynamic memory on the heap while automatically handling an
    object's lifecycle.
 
-   The 'new' function allows to dynamically allocate memory for a single
-   value or array of type <type>. The function 'new' returns a pointer to
-   the beginning of the newly allocated memory.
+   A 'new' expression dynamically allocates an object or an array of objects.
+   On success, it returns a pointer to the object or the first array element.
 
    Characteristics:
-   - Memory Allocation: It calculates the size of the type and requests
-     that exact amount of bytes from the heap.
-   - Initialization: It instantly runs the object's constructor to set up the data.
+   - Memory Allocation: It requests storage for the object or array. The allocator
+     may need additional space for bookkeeping or alignment.
+   - Initialization: For class types, initialization can call a constructor.
+     An 'int' has no constructor: 'new int' leaves its value uninitialized,
+     'new int{}' initializes it to zero, and 'new int(value)' initializes it
+     with 'value'. The stored value does not change the allocation size.
 
    'new' operator syntax:
 
    - Allocate memory to contain one single element of type <type>:
      ```cpp
-     pointer = new type (object)
+      pointer = new type(value);
      ```
 
    - Allocate a block (an array) of elements of type type, where 'number_of_elements'
      is an integer value representing the amount of these:
      ```cpp
-     pointer = new type [number_of_elements]
+      pointer = new type[number_of_elements];
      ```
 
    Example: allocate a block (an array) of 5 integers:
    ```cpp
-   int * foo;
-   foo = new type [number_of_elements];
-   foo = new int [5];
+    int* foo = new int[5];
+    // Use the array, then release it with delete[] foo.
    ```
 
    'delete' operator syntax:
@@ -57,8 +58,11 @@
      delete[] array;
    ```
 
-   - Failure Handling: If the system is out of memory, it throws a 'std::bad_alloc'
-     exception (unless new(std::nothrow) is explicitly used, which returns nullptr):
+   - Failure Handling: Ordinary throwing allocation reports failure with
+     'std::bad_alloc'. This can happen because of process limits or an inability
+     to satisfy the request, not only because the entire system is out of memory.
+     The 'std::nothrow' form returns nullptr on allocation failure instead.
+     It does not suppress exceptions thrown by a class constructor.
 
      1. Throwing an exception:
        ```cpp
@@ -83,14 +87,14 @@
 
          }
          catch (const std::bad_alloc& e) {
-             // This block executes ONLY if the system runs completely out of memory
+              // Handle an allocation request that could not be satisfied.
              std::cerr << "Memory allocation failed: " << e.what() << "\n";
 
              // Take corrective action or gracefully terminate
              return 1;
          }
 
-         // Clean up memory when done (only if foo was successfully allocated)
+          // Release the array. Deleting nullptr would also be safe.
          delete[] foo;
          return 0;
      }
@@ -105,58 +109,68 @@
 
      ```cpp
      int * foo;
-     foo = new (nothrow) int [5];
+      foo = new (std::nothrow) int [5];
      if (foo == nullptr) {
-       // error assigning memory. Take measures.
+        // Handle allocation failure before dereferencing foo.
      }
      ```
      In this case, if the allocation of this block of memory fails, the failure can be
-     detected by checking if foo is a null pointer
+      detected by checking if foo is a null pointer. Release a successfully
+      allocated array with delete[] foo.
 */
 
 #include <iostream>
 #include <print>
+#include <limits>
 
-// The library <new> is not necessary for basic usage of 'new' and 'delete'.
-// However, it is necessary for 'new(std::nothrow) to return a 'nullptr'
-// in the case of unsuccessful memory allocation using 'new'.
+// The header <new> declares std::nothrow and std::bad_alloc.
+// Basic new/delete expressions do not require this header.
 #include <new>
 
 int main () {
-    int userValue;
+    int userValue = 0;
 
-    std::println("Enter a positive integer to allocate memory on the heap to store it: ");
+    std::println("Enter an integer to allocate memory on the heap to store it: ");
 
-    std::cin >> userValue;
+    // Extraction returns the stream; ! tests whether reading failed.
+    if (!(std::cin >> userValue)) {
+        std::println(
+            "Error: enter an integer between {} and {}.",
+            std::numeric_limits<int>::min(),
+            std::numeric_limits<int>::max()
+        );
+        return 1;
+    }
 
-    // int *ptr = new (std::nothrow) int (userValue);
-    int *ptr = nullptr;
+    // To simulate allocation failure, replace the allocation below with:
+    // int* ptr = nullptr;
+    // Allocate one int, initialized with userValue, not userValue integers.
+    int *ptr = new (std::nothrow) int (userValue);
 
-    // Check for null pointer 'nullptr'.
+    // Check for allocation failure before dereferencing ptr.
     if (ptr == nullptr) {
         std::println("Error assigning memory. NUll pointer 'nullptr' found.");
-        return -1;
+        return 1;
     }
 
     std::println("Your input saved in the heap is: {}", *ptr);
     std::println("The memory was saved at the address: {}", static_cast<const void*>(ptr));
 
-    // Delete the assigned memory
+    // Release the single object allocated with new (not new[]).
     delete ptr;
 
-    // Assign the pointer to 'nullptr' to avoid a "dangling pointer"
+    // Clear this dangling pointer; any other pointers to the object remain dangling.
     ptr = nullptr;
 
     return 0;
 }
 
 
-// If the allocated memory is not released, and the block using it goes
-// out of scope, it would a memory leak. Memory leaks occur because when
-// the block of code goes out scope, the program cannot use/delete this
-// memory because its memory address would become unreacheable for the
-// program. However, the memory that was assigned is still occupying
-// the memory in the operating system. Example:
+// A memory leak occurs when allocated memory is no longer reachable and has
+// not been released. A local raw pointer going out of scope does not delete
+// the object it points to. If no other pointer retains its address, the
+// allocation remains occupied but cannot be accessed or released by the program.
+// Example:
 
 // ```cpp
 // void memoryLeakExample() {
@@ -165,15 +179,13 @@ int main () {
 //
 //     // Forgot to delete the memory 'delete ptr'.
 //
-// }  // Memory goes out of scope.
+// }  // The pointer goes out of scope; the allocated integer remains allocated.
 // ```
 //
 // Consequences:
-// 1. The immediate effect is loosing access to the assigned memory.
-// 2. The short-term consequence is increasing RAM usage if the memory
-// was assgined in a loop, a background thread, or a function called
-// repeatedly
-// 3. The long-term consequence is degradation and crashes. Depending
-// on how long the program runs, there could be performance slowdown
-// due to the system using virtual memory, or crashes if the OS runs
-// out of RAM.
+// 1. The program loses access to memory that remains allocated.
+// 2. Repeated leaks can increase memory usage over the lifetime of the process.
+// 3. Memory pressure can cause slowdowns from paging, allocation failures,
+// or termination by the operating system.
+// The OS normally reclaims process memory on exit, but that does not prevent
+// leaks from causing problems while the program is running.
