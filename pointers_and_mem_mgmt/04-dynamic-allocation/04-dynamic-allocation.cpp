@@ -123,30 +123,29 @@
 #include <new>
 
 int main () {
-    int neededMemByUser;
+    int userValue;
 
     std::println("Enter a positive integer to allocate memory on the heap to store it: ");
 
-    std::cin >> neededMemByUser;
+    std::cin >> userValue;
 
-    int *ptr = new (std::nothrow) int (neededMemByUser);
+    // int *ptr = new (std::nothrow) int (userValue);
+    int *ptr = nullptr;
 
     // Check for null pointer 'nullptr'.
     if (ptr == nullptr) {
-        std::println("Error assigning memory.");
+        std::println("Error assigning memory. NUll pointer 'nullptr' found.");
         return -1;
     }
-    else {
-        std::println("Your input saved in the heap is: {}", *ptr);
-        std::println("The memory was saved at the address: {}", static_cast<const void*>(ptr));
 
-        // Delete the assigned memory
-        delete ptr;
+    std::println("Your input saved in the heap is: {}", *ptr);
+    std::println("The memory was saved at the address: {}", static_cast<const void*>(ptr));
 
-        // Assign the pointer to 'nullptr' to avoid a "dangling pointer"
-        ptr = nullptr;
-    }
+    // Delete the assigned memory
+    delete ptr;
 
+    // Assign the pointer to 'nullptr' to avoid a "dangling pointer"
+    ptr = nullptr;
 
     return 0;
 }
