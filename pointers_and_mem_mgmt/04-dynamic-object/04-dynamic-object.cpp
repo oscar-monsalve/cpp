@@ -1,6 +1,7 @@
 // # 4. Dynamically Allocate a Class Object
 //
-// Define a `Person` class with a name_ and age_. Dynamically allocate a single `Person` object, access its members through a pointer, and release the allocated memory.
+// Define a `Person` class with a name_ and age_. Dynamically allocate a single `Person` object, access its members
+// through a pointer, and release the allocated memory.
 //
 // **Requirements:**
 //
@@ -41,16 +42,22 @@ public:
 
 int main() {
     std::string name{};
+    std::string ageInput{};
     unsigned int age{};
 
     std::println("Enter your name: ");
-    if (!(std::cin >> name)) {
+    if (!std::getline(std::cin, name)) {  // Using 'std::getline()' to read input until a new line
         std::println("Error: enter a valid name.");
         return 1;
     }
 
+    if (name.find_first_not_of(" \t\e\n") == std::string::npos) {
+        std::println("Error: name cannot be blank.");
+        return 1;
+    }
+
     std::println("Enter your age: ");
-    if (!(std::cin >> age)) {
+    if (!std::getline(std::cin, age)) {
         std::println("Error: enter a valid age.");
         return 1;
     }
