@@ -42,7 +42,6 @@ public:
 
 int main() {
     std::string name{};
-    std::string ageInput{};
     unsigned int age{};
 
     std::println("Enter your name: ");
@@ -57,7 +56,7 @@ int main() {
     }
 
     std::println("Enter your age: ");
-    if (!std::getline(std::cin, age)) {
+    if (!(std::cin >> age)) {
         std::println("Error: enter a valid age.");
         return 1;
     }
