@@ -21,11 +21,10 @@ void memoryLeak() {
     );
 
     // Intentionally omitting the 'delete' operator.
+    // The solution to the leak: call 'delete'.
+    // delete allocNumber;  // Uncomment to get the properly free allocated memory
 
-    // The solution to the leak is to call 'delete':
-    // delete allocNumber;
-
-} // The local pointer disappears; the allocated integer remains alive.
+} // The local pointer disappears. The allocated integer remains alive.
 
 void danglePointer() {
     // 2. Dangling pointer
