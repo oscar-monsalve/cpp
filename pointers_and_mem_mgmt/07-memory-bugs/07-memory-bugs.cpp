@@ -9,40 +9,46 @@ void memoryLeak() {
 
     int* allocNumber = new (std::nothrow) int(42);
     if (allocNumber == nullptr) {
+        std::println("Allocation failed. Returning.");
         return;
     }
 
     std::println("The allocated number is: {}", *allocNumber);
-    std::println("Stored in address: {}\n", static_cast<const void*>(allocNumber));
+    std::println("Address: {}\n", static_cast<const void*>(allocNumber));
 
     std::println(
-        "Problem: memory has not been deleted. It would produce a memory leak when it goes out of scope."
+        "Problem: memory has not been deleted. It would produce a memory leak when it goes out of scope.\n"
     );
-    // TODO: how to simulate the pointer going out of scope and using it again so it becomes unreachable?
-    // Install gf2 debugger on the desktop pc
-}
+
+    // Intentionally omitting the 'delete' operator.
+
+    // The solution to the leak is to call 'delete':
+    // delete allocNumber;
+
+} // The local pointer disappears; the allocated integer remains alive.
 
 void danglePointer() {
     // 2. Dangling pointer
-    std::println("\n2. Dangling pointer example.");
-    int* dangling = new (std::nothrow) int(42);
-    if (dangling == nullptr) {
-        std::println("Error: null pointer 'nullptr' found.");
+    std::println("\n2. Dangling pointer example:\n");
+
+    int* number = new (std::nothrow) int(42);
+    if (number == nullptr) {
+        std::println("Allocation failed. Returning.");
         return;
     }
 
-    std::println("The allocated number is: {}", *dangling);
-    std::println("Stored in address: {}\n", static_cast<const void*>(dangling));
+    std::println("The allocated number is: {}", *number);
+    std::println("Address: {}\n", static_cast<const void*>(number));
 
-    delete dangling;
+    delete number;     // Ends the object's lifetime and releases its storage.
+    number = nullptr;  // Clears this pointer's dangling address.
 
-    std::println("Memory has been deleted. The pointer to the memory does not exists anymore.");
-    std::println("Should it be used again, a memory error would occur.");
-    std::println("For example, it is used again to print the number and its memory address.");
-    std::println("The number is not the correct one, but the address is still the same.\n");
+    if (number == nullptr) {
+        std::println("The object has been deleted; the pointer cannot be dereferenced.\n");
+    }
 
-    std::println("The allocated number is: {}", *dangling);
-    std::println("Stored in address: {}", static_cast<const void*>(dangling));
+    // WRONG: dereferencing after delete is use-after-free.
+    // std::println("{}", *number);
 }
 
 void doubleDeletion();
@@ -50,8 +56,12 @@ void mismatchedNewDelete();
 
 
 int main () {
-    // Ex. 1: memory leak
+    // 1. Memory leak example
     memoryLeak();
+    // The allocation is now unreachable through our program's pointers.
+
+    // 2. Dangling pointer example
+    // danglePointer();
 
     return 0;
 }
