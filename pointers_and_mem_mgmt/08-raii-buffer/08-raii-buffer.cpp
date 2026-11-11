@@ -1,23 +1,19 @@
 #include <print>
 #include <new>          // Provides 'std::nothrow'
-#include <cstddef>      // Provides 'size_t'
-// #include <string_view>  // Provides 'std::string_view'
-// #include <utility>      // Provides 'std::move()'
+#include <cstddef>      // Provides 'std::size_t'
+#include <string>       // Provides 'std::string'
+#include <string_view>  // Provides 'std::string_view' for efficient name passing
 
 
 class Buffer {
+private:
+    char* array = nullptr;  // Initialize to nullptr safely
+    std::size_t arraySize;
+    std::string name;
+
 public:
-    const std::size_t arraySize;
-
-    Buffer(std::size_t arraySize) : arraySize(arraySize) {
-
-        // Prevent double-free error when trying to copy the object before calling 'new'
-        // Move the original pointer to a new one
-        if (array == nullptr) {
-            std::println("Can't copy the object.");
-            return;
-        }
-
+    Buffer(std::size_t arraySize, std::string_view objectName)
+        : arraySize(arraySize), name(objectName) {
         array = new (std::nothrow) char[arraySize];
         if (array == nullptr) {
             std::println("Allocation failed. Returning");
@@ -30,14 +26,48 @@ public:
         }
     }
 
-    ~Buffer() {
-        delete[] array;
+    // Rule of three: 1. Copy constructor
+    Buffer(const Buffer& other)
+        : arraySize(other.arraySize), name(other.name) {
+        array = new (std::nothrow) char[arraySize];
+        if (array == nullptr) {
+            std::println("Allocation failed. Returning");
+            return;
+        }
+
+        for (std::size_t i = 0; i < arraySize; ++i) {
+            array[i] = other.array[i];
+        }
     }
 
-    const void readElements() {  // readElements() can be const, since it does not modify the buffer
+    // Rule of three: 2. Copy-assignment operator
+    Buffer& operator=(const Buffer& other) {
+        // Handle assigning an object to itself: a = a
+        if (this == &other) {
+            return *this;
+        }
+
+        // Allocate independent storage before releasing our current storage.
+        char* replacement = new char[other.arraySize];
+        for (std::size_t i = 0; i < other.arraySize ; ++i) {
+            replacement[i] = other.array[i];
+        }
+
+        // Replace the old allocation with the completed copy.
+        delete[] array;
+        array = replacement;
+        arraySize = other.arraySize;
+
+        return *this;
+    }
+
+    // Rule of three: 3. Destructor
+    ~Buffer() {delete[] array;}
+
+    void read() const {  // readElements() can be const, since it does not modify the buffer
         if (array == nullptr) return;
 
-        std::println("Array elements:");
+        std::println("Array elements: ");
         for (std::size_t i = 0; i < arraySize ; ++i) {
             std::print("{} ", array[i]);
         }
@@ -49,24 +79,28 @@ public:
         // std::println("As a debug range:   {:?}", std::string_view(array, arraySize));
     }
 
-    void writeElements() {
+    void write(std::size_t index, char value) {
     }
-
-private:
-    char* array = nullptr;  // Initialize to nullptr safely
-    char* copiedArray = nullptr;
 };
 
 
 int main() {
     constexpr std::size_t CHAR_ARRAY_SIZE = 26;
 
-    Buffer charArray = Buffer(CHAR_ARRAY_SIZE);
+    std::println("Initialize first object 'b1':");
+    Buffer b1(CHAR_ARRAY_SIZE);
+    b1.read();
 
-    charArray.readElements();
+    std::println("Copy b1 to second object 'b2':");
+    //
+    Buffer b2 = b1;  // Triggers copy constructor
+    b2.read();
 
-    // If the object is copied, a 'double deletion' would cause undefined behaviour
-    // Buffer b2 = charArray;
+    std::println("Initialize a third object 'b3' and rewrite its content from b1:");
+    Buffer b3(5);
+    b3.read();
+    b3 = b1;  // Triggers copy-assignment operation
+    b3.read();
 
     return 0;
-}
+}  // Destructors run in reverse construction order: b3, b2, then b1, each releasing its own allocation.
