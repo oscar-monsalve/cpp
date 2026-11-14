@@ -4,6 +4,9 @@
 #include <string>       // Provides 'std::string'
 #include <string_view>  // Provides 'std::string_view' for efficient name passing
 
+// Additional behavious with respect to the exercise statement:
+// Print dynamically the name of the class' object
+
 
 class Buffer {
 private:
@@ -57,6 +60,7 @@ public:
         delete[] array;
         array = replacement;
         arraySize = other.arraySize;
+        name = other.name;
 
         return *this;
     }
@@ -64,10 +68,13 @@ public:
     // Rule of three: 3. Destructor
     ~Buffer() {delete[] array;}
 
+    // Getter to print the object's name
+    std::string_view getName() const { return name; }
+
     void read() const {  // readElements() can be const, since it does not modify the buffer
         if (array == nullptr) return;
 
-        std::println("Array elements: ");
+        std::println("Array elements for object '{}': ", name);
         for (std::size_t i = 0; i < arraySize ; ++i) {
             std::print("{} ", array[i]);
         }
@@ -88,7 +95,7 @@ int main() {
     constexpr std::size_t CHAR_ARRAY_SIZE = 26;
 
     std::println("Initialize first object 'b1':");
-    Buffer b1(CHAR_ARRAY_SIZE);
+    Buffer b1(CHAR_ARRAY_SIZE, "b1");
     b1.read();
 
     std::println("Copy b1 to second object 'b2':");
@@ -97,7 +104,7 @@ int main() {
     b2.read();
 
     std::println("Initialize a third object 'b3' and rewrite its content from b1:");
-    Buffer b3(5);
+    Buffer b3(5, "b3");
     b3.read();
     b3 = b1;  // Triggers copy-assignment operation
     b3.read();
