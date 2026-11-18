@@ -1,8 +1,9 @@
 #include <print>
-#include <new>          // Provides 'std::nothrow'
+#include <new>          // Provides 'std::nothrow' and 'std::bad_alloc'
 #include <cstddef>      // Provides 'std::size_t'
 #include <string>       // Provides 'std::string'
 #include <string_view>  // Provides 'std::string_view' for efficient name passing
+#include <cstdio>       // Provides 'stderr'
 
 // Additional behavious with respect to the exercise statement:
 // Print dynamically the name of the class' object
@@ -15,13 +16,10 @@ private:
     std::string name;
 
 public:
-    Buffer(std::size_t arraySize, std::string_view objectName)
+    Buffer(std::size_t arraySize,
+           std::string_view objectName = "unnamed")
         : arraySize(arraySize), name(objectName) {
-        array = new (std::nothrow) char[arraySize];
-        if (array == nullptr) {
-            std::println("Allocation failed. Returning");
-            return;
-        }
+        array = new char[arraySize];  // Throws std::bad_alloc on failure.
 
         // Fill the array with the letters a to z
         for (std::size_t i = 0; i < arraySize; ++i) {
@@ -31,12 +29,8 @@ public:
 
     // Rule of three: 1. Copy constructor
     Buffer(const Buffer& other)
-        : arraySize(other.arraySize), name(other.name) {
-        array = new (std::nothrow) char[arraySize];
-        if (array == nullptr) {
-            std::println("Allocation failed. Returning");
-            return;
-        }
+        : arraySize(other.arraySize) {
+        array = new char[arraySize];  // Throws std::bad_alloc on failure.
 
         for (std::size_t i = 0; i < arraySize; ++i) {
             array[i] = other.array[i];
@@ -60,7 +54,6 @@ public:
         delete[] array;
         array = replacement;
         arraySize = other.arraySize;
-        name = other.name;
 
         return *this;
     }
@@ -70,6 +63,11 @@ public:
 
     // Getter to print the object's name
     std::string_view getName() const { return name; }
+
+    // Setter to assign a name
+    void setName(std::string_view objectName) {
+        name = objectName;
+    }
 
     void read() const {  // readElements() can be const, since it does not modify the buffer
         if (array == nullptr) return;
@@ -94,20 +92,30 @@ public:
 int main() {
     constexpr std::size_t CHAR_ARRAY_SIZE = 26;
 
-    std::println("Initialize first object 'b1':");
-    Buffer b1(CHAR_ARRAY_SIZE, "b1");
-    b1.read();
+    // Throwing 'new' reports allocation failure with std::bad_alloc.
+    // Let it propagate from constructors: failed construction produces no usable object.
+    // When unwinding to catch, fully constructed local objects are destroyed automatically.
+    try {
+        std::println("Initialize first object 'b1':");
+        Buffer b1(CHAR_ARRAY_SIZE, "b1");
+        b1.read();
 
-    std::println("Copy b1 to second object 'b2':");
-    //
-    Buffer b2 = b1;  // Triggers copy constructor
-    b2.read();
+        std::println("Copy b1 to second object 'b2':");
+        //
+        Buffer b2 = b1;  // Triggers copy constructor
+        b2.read();
 
-    std::println("Initialize a third object 'b3' and rewrite its content from b1:");
-    Buffer b3(5, "b3");
-    b3.read();
-    b3 = b1;  // Triggers copy-assignment operation
-    b3.read();
+        std::println("Initialize a third object 'b3' and rewrite its content from b1:");
+        Buffer b3(5, "b3");
+        b3.read();
+        b3 = b1;  // Triggers copy-assignment operation
+        b3.read();
+    }
+
+    catch (const std::bad_alloc& error) {
+        std::println(stderr, "Memory allocation failed: {}", error.what());
+        return 1;
+    }
 
     return 0;
 }  // Destructors run in reverse construction order: b3, b2, then b1, each releasing its own allocation.
