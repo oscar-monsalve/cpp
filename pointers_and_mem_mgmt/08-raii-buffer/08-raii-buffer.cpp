@@ -4,6 +4,7 @@
 #include <string>       // Provides 'std::string'
 #include <string_view>  // Provides 'std::string_view' for efficient name passing
 #include <cstdio>       // Provides 'stderr'
+#include <stdexcept>    // Provide 'std::out_of_range'
 
 // Additional behavious with respect to the exercise statement:
 // Print dynamically the name of the class' object
@@ -13,7 +14,7 @@ class Buffer {
 private:
     char* array = nullptr;  // Initialize to nullptr safely
     std::size_t arraySize;
-    std::string name;
+    std::string name = "unnamed";
 
 public:
     Buffer(std::size_t arraySize,
@@ -61,15 +62,12 @@ public:
     // Rule of three: 3. Destructor
     ~Buffer() {delete[] array;}
 
-    // Getter to print the object's name
-    std::string_view getName() const { return name; }
-
     // Setter to assign a name
     void setName(std::string_view objectName) {
         name = objectName;
     }
 
-    void read() const {  // readElements() can be const, since it does not modify the buffer
+    void read() const {  // read() can be const, since it does not modify the buffer
         if (array == nullptr) return;
 
         std::println("Array elements for object '{}': ", name);
@@ -84,7 +82,22 @@ public:
         // std::println("As a debug range:   {:?}", std::string_view(array, arraySize));
     }
 
+    // Overloading 'read()' to support reading the buffer at an index
+    char read(std::size_t index) const {
+        if (index >= arraySize) {
+            throw std::out_of_range("Buffer::read: index out of range.");
+        }
+
+        return array[index];
+    }
+
     void write(std::size_t index, char value) {
+        // Correct range for index is from 0 upto arraySize - 1
+        if (index >= arraySize) {
+            throw std::out_of_range("Buffer::write: index out of range.");
+        }
+
+        array[index] = value;
     }
 };
 
@@ -101,8 +114,8 @@ int main() {
         b1.read();
 
         std::println("Copy b1 to second object 'b2':");
-        //
         Buffer b2 = b1;  // Triggers copy constructor
+        b2.setName("b2");
         b2.read();
 
         std::println("Initialize a third object 'b3' and rewrite its content from b1:");
@@ -110,6 +123,24 @@ int main() {
         b3.read();
         b3 = b1;  // Triggers copy-assignment operation
         b3.read();
+
+        std::println("Writing elements to 'b1': ");
+        b1.write(0, '1');
+        b1.read();   // Read the whole object
+        std::println("The first value of 'b1' after writing to it is: {}\n", b1.read(0));
+
+        // Tests
+        std::println("Tests: ");
+        try {
+            b1.read(CHAR_ARRAY_SIZE);  // Out of range for the read method
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}\n", error.what());
+        }
+
+        std::println("Verifying that copies are independent.");
+        std::println("This checks that modifying the original doesn’t modify either copy:");
+        std::println("b1: {}, b2: {}, b3: {}", b1.read(0), b2.read(0), b3.read(0));
     }
 
     catch (const std::bad_alloc& error) {
