@@ -4,7 +4,7 @@
 #include <string>       // Provides 'std::string'
 #include <string_view>  // Provides 'std::string_view' for efficient name passing
 #include <cstdio>       // Provides 'stderr'
-#include <stdexcept>    // Provide 'std::out_of_range'
+#include <stdexcept>    // Provides 'std::out_of_range'
 
 // Additional behavious with respect to the exercise statement:
 // Print dynamically the name of the class' object
