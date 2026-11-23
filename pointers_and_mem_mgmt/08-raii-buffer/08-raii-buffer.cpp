@@ -17,12 +17,12 @@ private:
     std::string name = "unnamed";
 
 public:
-    Buffer(std::size_t arraySize,
-           std::string_view objectName = "unnamed")
+    Buffer(std::size_t arraySize, std::string_view objectName = "unnamed")
         : arraySize(arraySize), name(objectName) {
         array = new char[arraySize];  // Throws std::bad_alloc on failure.
 
-        // Fill the array with the letters a to z
+        // Fill with successive character codes starting at 'a', converted to char.
+        // On ASCII-compatible systems, values beyond 'z' continue into punctuation.
         for (std::size_t i = 0; i < arraySize; ++i) {
             array[i] = static_cast<char>('a' + i);
         }
@@ -67,22 +67,20 @@ public:
         name = objectName;
     }
 
-    void read() const {  // read() can be const, since it does not modify the buffer
-        if (array == nullptr) return;
-
+    void printElements() const {  // Printing does not modify the buffer.
         std::println("Array elements for object '{}': ", name);
         for (std::size_t i = 0; i < arraySize ; ++i) {
             std::print("{} ", array[i]);
         }
         std::println("\n");
 
-        // C++26 Modern Alternative 1: Print as a joined string using string_view
+        // C++23 alternative: print the characters as a string using string_view.
         // std::println("As a single string: {}", std::string_view(array, arraySize));
-        // C++26 Modern Alternative 2: Print as a Python-style list range
-        // std::println("As a debug range:   {:?}", std::string_view(array, arraySize));
+        // C++23 alternative: print a quoted string with special characters escaped.
+        // std::println("As a debug string: {:?}", std::string_view(array, arraySize));
     }
 
-    // Overloading 'read()' to support reading the buffer at an index
+    // Read a single character, rejecting indices outside the buffer.
     char read(std::size_t index) const {
         if (index >= arraySize) {
             throw std::out_of_range("Buffer::read: index out of range.");
@@ -111,37 +109,123 @@ int main() {
     try {
         std::println("Initialize first object 'b1':");
         Buffer b1(CHAR_ARRAY_SIZE, "b1");
-        b1.read();
+        b1.printElements();
 
         std::println("Copy b1 to second object 'b2':");
         Buffer b2 = b1;  // Triggers copy constructor
         b2.setName("b2");
-        b2.read();
+        b2.printElements();
 
         std::println("Initialize a third object 'b3' and rewrite its content from b1:");
         Buffer b3(5, "b3");
-        b3.read();
+        b3.printElements();
         b3 = b1;  // Triggers copy-assignment operation
-        b3.read();
+        b3.printElements();
 
         std::println("Writing elements to 'b1': ");
         b1.write(0, '1');
-        b1.read();   // Read the whole object
+        b1.printElements();   // Print all elements.
         std::println("The first value of 'b1' after writing to it is: {}\n", b1.read(0));
 
         // Tests
+        std::println("============");
         std::println("Tests: ");
+        std::println("============");
+
+        // 1. Read/write index 0: expected success
         try {
-            b1.read(CHAR_ARRAY_SIZE);  // Out of range for the read method
+            std::println("1. Read at first index for b3: {}", b3.read(0));
+            b3.write(0, 'Z');
+            std::println("Write at first index for b3: {}\n", b3.read(0));
         }
         catch (const std::out_of_range& error) {
             std::println(stderr, "{}\n", error.what());
         }
 
+        // 2. Read/write index 'size - 1': expected success
+        try {
+            std::println("2. Read at last index for b3: {}", b3.read(CHAR_ARRAY_SIZE - 1));
+            b3.write(CHAR_ARRAY_SIZE - 1, 'A');
+            std::println("Write at last index for b3: {}\n", b3.read(CHAR_ARRAY_SIZE - 1));
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}\n", error.what());
+        }
+
+        // 3. Read at index 'size': expected exception
+        std::println("3. Read out-of-bounds for b3:");
+        try {
+            std::println("3. Read out-of-bounds for b3: {}", b3.read(CHAR_ARRAY_SIZE));
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}\n", error.what());
+        }
+
+        // 4. Write at index 'size': expected exception
+        std::println("4. Write out-of-bounds for b3:");
+        try {
+            b3.write(CHAR_ARRAY_SIZE, 'G');
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}", error.what());
+        }
+        std::println("b3 contents unchanged since last change: ");
+        b3.printElements();
+
+        // 5. Zero-sized buffer, index 0: expected exception
+        std::println("5. Zero-sized buffer, index 0, trying to read:");
+        try {
+            Buffer zeroSizedBuffer(0, "zeroSizedBuffer");
+            zeroSizedBuffer.read(0);
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}", error.what());
+        }
+        std::println("   Zero-sized buffer, index 0, trying to write:");
+        try {
+            Buffer zeroSizedBuffer(0, "zeroSizedBuffer");
+            zeroSizedBuffer.write(0, 'X');
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}\n", error.what());
+        }
+
+        // 6. Self-assigment: expected contents unchanged
+        std::println("6. Self-assigment (expected unchanged contents): ");
+        try {
+            Buffer obj1(2, "obj1");
+            obj1.printElements();
+            obj1 = obj1;
+            obj1.printElements();
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}", error.what());
+        }
+
+        // 7. Modify a copy: expected original unchanged
+        std::println("7. Modify a copy (expected original unchanged): ");
+        try {
+            Buffer original(30, "original");
+            original.printElements();
+
+            Buffer copy = original;
+            copy.setName("copy");
+            copy.printElements();
+
+            copy.write(0, 'Z');
+
+            original.printElements();
+            copy.printElements();
+
+        }
+        catch (const std::out_of_range& error) {
+            std::println(stderr, "{}", error.what());
+        }
+
         std::println("Verifying that copies are independent.");
         std::println("This checks that modifying the original doesn’t modify either copy:");
         std::println("b1: {}, b2: {}, b3: {}", b1.read(0), b2.read(0), b3.read(0));
-    }
+    } // b3, b2, then b1 are destroyed here; nested-scope buffers were destroyed earlier.
 
     catch (const std::bad_alloc& error) {
         std::println(stderr, "Memory allocation failed: {}", error.what());
@@ -149,4 +233,4 @@ int main() {
     }
 
     return 0;
-}  // Destructors run in reverse construction order: b3, b2, then b1, each releasing its own allocation.
+}
