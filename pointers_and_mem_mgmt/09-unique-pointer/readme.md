@@ -4,7 +4,12 @@ Create a `Resource` class that prints messages when it is constructed and destro
 
 **Requirements:**
 
-- Create the resource with `std::make_unique`.
-- Pass ownership using `std::move`.
-- Show that the original pointer becomes empty after the transfer.
-- Do not call `delete` manually.
+- [ ] Create the resource with `std::make_unique`.
+- [ ] Pass ownership using `std::move`.
+- [ ] Show that the original pointer becomes empty after the transfer.
+- [ ] Do not call `delete` manually.
+
+
+## Reading
+
+https://www.luisllamas.es/en/cpp-unique-ptr/

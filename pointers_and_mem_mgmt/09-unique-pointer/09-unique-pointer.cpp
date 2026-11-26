@@ -7,7 +7,8 @@ class Resource {
 public:
     std::size_t number;
 
-    Resource(std::size_t number) : number(number) {
+    Resource(std::size_t number)
+        : number(number) {
         std::println("Allocating resource...");
     }
 
@@ -19,6 +20,8 @@ private:
 };
 
 int main () {
+    std::size_t number;
+
     Resource resource_1 = std::make_unique<Resource>(number);
 
     return 0;
